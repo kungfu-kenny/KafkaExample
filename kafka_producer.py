@@ -1,13 +1,17 @@
+from pprint import pprint
 from time import sleep
 from json import dumps
+from pprint import pprint
 from kafka import KafkaProducer
+from data_development import develop_random_data
 
 
 producer = KafkaProducer(
     bootstrap_servers=['localhost:9092'],
     value_serializer=lambda x: dumps(x).encode('utf-8')
 )
-for j in range(9999):
-    data = {'counter': j}
-    producer.send('messages', value=data)
-    sleep(3)
+for j in range(1, 100000):
+    data = develop_random_data(j)
+    pprint(data)
+    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+    producer.send('message', value=data)
