@@ -21,5 +21,6 @@ def develop_stats():
         "Length": len(value_list),
     }
 
+
 if __name__ == '__main__':
     pprint(develop_stats())

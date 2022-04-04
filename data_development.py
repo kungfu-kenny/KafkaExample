@@ -6,11 +6,72 @@ import statistics
 from uuid import uuid4
 from datetime import datetime
 
+
 string_range = 30
 value_folder = 'analysis'
 value_file = 'sent.json'
+value_file_check = 'check.json'
+
 value_selected = os.path.join(os.getcwd(), value_folder)
 value_selected_file = os.path.join(value_selected, value_file)
+value_selected_check = os.path.join(value_selected, value_file_check)
+
+def develop_file_json(file_path:str, value_check:bool=True) -> None:
+    """
+    Function which is dedicated for checking files
+    Input:  file_path = file of the json values
+    Output: we created files if have to
+    """
+    if not os.path.exists(file_path):    
+        value_use = [] if value_check else {}
+        with open(file_path, "w") as file:
+            json.dump(
+                value_use, 
+                file,
+                indent=4
+            )
+
+def develop_file_check(value_uuid:str) -> bool:
+    """
+    Function which is dedicated to check values
+    Input:  value_uuid = uuid which shows values
+    Output: boolean value to get it
+    """
+    with open(value_selected_check, 'r') as json_file:
+        value_dict = json.load(json_file)
+    return value_dict.get(value_uuid, False)
+
+def develop_file_insert(value_file:dict, value_bool:bool=True) -> None:
+    """
+    Function which is about the insertion values
+    Input:  value_path = path of the selected file
+            value_file = dictionary to develop
+            value_bool = boolean value to develop append or update
+    Output: we inserted values of the 
+    """
+    value_path = value_selected_file if value_bool else value_selected_check
+    with open(value_path, 'r') as read:
+        value_dict = json.load(read)
+    if value_bool:
+        value_dict.append(value_file)
+    else:
+        value_dict.update(value_file)
+    with open(value_path, 'w') as write:
+        json.dump(
+            value_dict, 
+            write, 
+            indent=4
+        )
+
+def check_value_file() -> None:
+    """
+    Function which is dedicated to develop value files
+    Input:  None
+    Output: we developed previously required files
+    """
+    develop_folder() 
+    develop_file_json(value_selected_file, True)
+    develop_file_json(value_selected_check, False)
 
 def develop_random_data(index:int=0) -> dict:
     """
@@ -32,22 +93,3 @@ def develop_folder(folder:str=value_selected):
     Output: we created folder
     """
     os.path.exists(folder) or os.mkdir(folder)
-
-def check_presence_used(uuid):
-    with open(value_selected_file, "r") as file:
-        value_list = [f.get('uuid') for f in json.load(file)]
-    return uuid in value_list
-
-def insert_used_db(value_dict):
-    with open(value_selected_file, "r") as file:
-        value_list = json.load(file)
-        value_list.append(value_dict)
-    with open(value_selected_file, "w") as file:
-        json.dump(value_list, file)
-
-def check_value_file():
-    develop_folder()
-    if not os.path.exists(value_selected_file):
-        with open(value_selected_file, "w") as file:
-            json.dump([], file)
-
