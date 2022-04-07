@@ -12,10 +12,10 @@ producer = KafkaProducer(
 print('Started at: ', datetime.utcnow())
 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 
-for j in range(1, 100000):
+for j in range(1, 100):
     data = develop_random_data(j)
     print(f"Sent parameter with index:", j)
-    producer.send('message', value=data)
+    producer.send('message_test', value=data)
 
 print('Finished at: ', datetime.utcnow())
 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')

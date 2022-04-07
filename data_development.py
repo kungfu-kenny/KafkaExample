@@ -9,12 +9,15 @@ from datetime import datetime
 
 string_range = 30
 value_folder = 'analysis'
-value_file = 'sent.json'
-value_file_check = 'check.json'
 
 value_selected = os.path.join(os.getcwd(), value_folder)
-value_selected_file = os.path.join(value_selected, value_file)
-value_selected_check = os.path.join(value_selected, value_file_check)
+
+def value_selected_file(x):
+    return os.path.join(value_selected, f"sent_{x}.json")
+
+def value_selected_file_check(x):
+    return os.path.join(value_selected, f"check_{x}.json")
+
 
 def develop_file_json(file_path:str, value_check:bool=True) -> None:
     """
@@ -31,17 +34,18 @@ def develop_file_json(file_path:str, value_check:bool=True) -> None:
                 indent=4
             )
 
-def develop_file_check(value_uuid:str) -> bool:
+def develop_file_check(topic:str, value_uuid:str) -> bool:
     """
     Function which is dedicated to check values
-    Input:  value_uuid = uuid which shows values
+    Input:  topic = topic which we are used and search of the file
+            value_uuid = uuid which shows values
     Output: boolean value to get it
     """
-    with open(value_selected_check, 'r') as json_file:
+    with open(value_selected_file_check(topic), 'r') as json_file:
         value_dict = json.load(json_file)
     return value_dict.get(value_uuid, False)
 
-def develop_file_insert(value_file:dict, value_bool:bool=True) -> None:
+def develop_file_insert(value_file:dict, value_bool:bool=True, topic:str='message') -> None:
     """
     Function which is about the insertion values
     Input:  value_path = path of the selected file
@@ -49,7 +53,7 @@ def develop_file_insert(value_file:dict, value_bool:bool=True) -> None:
             value_bool = boolean value to develop append or update
     Output: we inserted values of the 
     """
-    value_path = value_selected_file if value_bool else value_selected_check
+    value_path = value_selected_file(topic) if value_bool else value_selected_file_check(topic)
     with open(value_path, 'r') as read:
         value_dict = json.load(read)
     if value_bool:
@@ -63,15 +67,16 @@ def develop_file_insert(value_file:dict, value_bool:bool=True) -> None:
             indent=4
         )
 
-def check_value_file() -> None:
+def check_value_file(topic:str) -> None:
     """
-    Function which is dedicated to develop value files
-    Input:  None
+    Function which is dedicated to develop value files in cases of the absence
+    Input:  value_selected_file = value file where to store selected values
+            value_selected_check = value file where to stor checked values
     Output: we developed previously required files
     """
     develop_folder() 
-    develop_file_json(value_selected_file, True)
-    develop_file_json(value_selected_check, False)
+    develop_file_json(value_selected_file(topic), True)
+    develop_file_json(value_selected_file_check(topic), False)
 
 def develop_random_data(index:int=0) -> dict:
     """
