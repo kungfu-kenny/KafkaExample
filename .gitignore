@@ -1,4 +1,5 @@
 venv
 bitnami
 analysis
+storage
 __pycache__

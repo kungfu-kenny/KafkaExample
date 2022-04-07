@@ -2,15 +2,15 @@ import os
 import json
 import random
 import string
-import statistics
 from uuid import uuid4
 from datetime import datetime
+from config import(
+    string_range,
+    topic_test,
+    value_selected,
+    value_selected_storage
+)
 
-
-string_range = 30
-value_folder = 'analysis'
-
-value_selected = os.path.join(os.getcwd(), value_folder)
 
 def value_selected_file(x):
     return os.path.join(value_selected, f"sent_{x}.json")
@@ -18,15 +18,27 @@ def value_selected_file(x):
 def value_selected_file_check(x):
     return os.path.join(value_selected, f"check_{x}.json")
 
+def value_selected_file_analyzed(x):
+    path = os.path.join(value_selected, f"analyzed_{x}.json")
+    if os.path.exists(path):
+        os.remove(path)
+    return path
 
-def develop_file_json(file_path:str, value_check:bool=True) -> None:
+def value_selected_file_plot(topic:str, delta:str, name:str) -> str:
+    return os.path.join(value_selected_storage, f"{topic}_{delta}_{name}.png")
+
+def develop_file_json(file_path:str, value_check:bool=True, value_use:object=None) -> None:
     """
     Function which is dedicated for checking files
     Input:  file_path = file of the json values
+            value_check = check parameter for the
     Output: we created files if have to
     """
     if not os.path.exists(file_path):    
-        value_use = [] if value_check else {}
+        if value_check == True:
+            value_use = [] 
+        elif value_check == False: 
+            value_use = {}
         with open(file_path, "w") as file:
             json.dump(
                 value_use, 
@@ -45,7 +57,7 @@ def develop_file_check(topic:str, value_uuid:str) -> bool:
         value_dict = json.load(json_file)
     return value_dict.get(value_uuid, False)
 
-def develop_file_insert(value_file:dict, value_bool:bool=True, topic:str='message') -> None:
+def develop_file_insert(value_file:dict, value_bool:bool=True, topic:str=topic_test) -> None:
     """
     Function which is about the insertion values
     Input:  value_path = path of the selected file

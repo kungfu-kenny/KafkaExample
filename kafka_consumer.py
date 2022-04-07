@@ -6,52 +6,49 @@ from data_development import (
     develop_file_insert
 )
 from kafka import KafkaConsumer
+from config import topic_test
 
 
-
-topic = 'message_test'
-check_value_file(topic)
-
+check_value_file(topic_test)
 consumer = KafkaConsumer(
-    topic,
+    topic_test,
     bootstrap_servers='localhost:9092',
     auto_offset_reset='earliest'
 )
 for message in consumer:
-    proccessed = datetime.utcnow()
+    received = datetime.utcnow()
     message_sent = json.loads(message.value)
-    # print(message_sent)
-    # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
     message_sent_uuid = message_sent.get('uuid', False)
     message_sent_date = message_sent.get('date_created', 'unknown')
     if message_sent.get('uuid'):
-        if not develop_file_check(topic, message_sent_uuid):
+        if not develop_file_check(topic_test, message_sent_uuid):
             
-            received = datetime.utcnow()
+            proccessed = datetime.utcnow()
             send = datetime.strptime(message_sent.get('date_created'), '%Y-%m-%d %H:%M:%S.%f')
-            delta = received - send
-            delta_operated = received - proccessed
-            delta_send = proccessed - send
+            delta_full = proccessed - send
+            delta_proccessed = proccessed - received
+            delta_send = received - send
             value_required = {
                 "uuid": message_sent.get('uuid'),
                 "name_person": message_sent.get("name_person"),
                 'date_send': message_sent.get('date_created'),
                 'date_received': str(received),
+                'date_processed': str(proccessed),
                 'delta_send': delta_send.microseconds/1000000 + delta_send.seconds + delta_send.days*60*60*24,
-                'delta_received': delta.microseconds/1000000 + delta.seconds + delta.days*60*60*24,
-                'delta_operated': delta_operated.microseconds/1000000 + delta_operated.seconds + delta_operated.days*60*60*24, 
+                'delta_full': delta_full.microseconds/1000000 + delta_full.seconds + delta_full.days*60*60*24,
+                'delta_proccessed': delta_proccessed.microseconds/1000000 + delta_proccessed.seconds + delta_proccessed.days*60*60*24, 
             }    
             develop_file_insert(
                 value_required, 
                 True,
-                topic
+                topic_test
             )
             develop_file_insert(
                 {
                     message_sent_uuid:message_sent_date
                 }, 
                 False,
-                topic
+                topic_test
             )
             print(message_sent.get("index", -1), message_sent_uuid, message_sent_date)
             print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
