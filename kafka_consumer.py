@@ -1,15 +1,13 @@
 import json
 from datetime import datetime
 from data_development import (
-    check_value_file,
-    develop_file_check,
+    develop_file_check_new,
     develop_file_insert
 )
 from kafka import KafkaConsumer
 from config import topic_test
 
 
-check_value_file(topic_test)
 consumer = KafkaConsumer(
     topic_test,
     bootstrap_servers='localhost:9092',
@@ -21,7 +19,7 @@ for message in consumer:
     message_sent_uuid = message_sent.get('uuid', False)
     message_sent_date = message_sent.get('date_created', 'unknown')
     if message_sent.get('uuid'):
-        if not develop_file_check(topic_test, message_sent_uuid):
+        if not develop_file_check_new(topic_test, message_sent_uuid):
             
             proccessed = datetime.utcnow()
             send = datetime.strptime(message_sent.get('date_created'), '%Y-%m-%d %H:%M:%S.%f')

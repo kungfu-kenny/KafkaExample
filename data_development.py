@@ -13,10 +13,16 @@ from config import(
 
 
 def value_selected_file(x):
-    return os.path.join(value_selected, f"sent_{x}.json")
+    return os.path.join(
+        value_selected, 
+        f"sent_{x}_{datetime.utcnow().strftime('%Y_%m_%d_%H')}_{int(datetime.utcnow().strftime('%M'))}.json"
+    )
 
 def value_selected_file_check(x):
-    return os.path.join(value_selected, f"check_{x}.json")
+    return os.path.join(
+        value_selected, 
+        f"check_{x}_{datetime.utcnow().strftime('%Y_%m_%d_%H')}_{int(datetime.utcnow().strftime('%M'))}.json"
+    )
 
 def value_selected_file_analyzed(x):
     path = os.path.join(value_selected, f"analyzed_{x}.json")
@@ -57,6 +63,21 @@ def develop_file_check(topic:str, value_uuid:str) -> bool:
         value_dict = json.load(json_file)
     return value_dict.get(value_uuid, False)
 
+def develop_file_check_new(topic:str, value_uuid:str) -> bool:
+    """
+    Function which is dedicated to check presence
+    Input:  topic = topic path value which could be used
+            value_uuid = uuid value which is searched 
+    Output: we inserted values
+    """
+    check_value_file(topic)
+    value_elements = [f for f in os.listdir(value_selected) if f'check_{topic}_' in f]
+    for files in value_elements:
+        with open(os.path.join(value_selected, files), 'r') as json_file:
+            if json.load(json_file).get(value_uuid, False):
+                return True
+    return False
+
 def develop_file_insert(value_file:dict, value_bool:bool=True, topic:str=topic_test) -> None:
     """
     Function which is about the insertion values
@@ -66,6 +87,15 @@ def develop_file_insert(value_file:dict, value_bool:bool=True, topic:str=topic_t
     Output: we inserted values of the 
     """
     value_path = value_selected_file(topic) if value_bool else value_selected_file_check(topic)
+    if not os.path.exists(value_path):
+        value_dict = [value_file] if value_bool else value_file
+        with open(value_path, 'w') as write:
+            json.dump(
+                value_dict, 
+                write, 
+                indent=4
+            )
+        return
     with open(value_path, 'r') as read:
         value_dict = json.load(read)
     if value_bool:
