@@ -1,11 +1,12 @@
+import os
 import json, statistics
 from pprint import pprint  
 import matplotlib.pyplot as plt  
 from data_development import (
+    merge_file_topic,
     develop_folder,
     develop_file_json,
-    check_value_file,
-    value_selected_file,
+    value_selected_file_merged,
     value_selected_file_analyzed,
     value_selected_file_plot
 )
@@ -16,8 +17,7 @@ from config import (
 
 
 def develop_stats_delta(topic:str, delta:str):
-    check_value_file(topic)
-    with open(value_selected_file(topic), 'r') as file:
+    with open(value_selected_file_merged(topic), 'r') as file:
         value_revision = [f.get(delta, -1) for f in json.load(file)]
     return {
         "Maximum Value": max(value_revision),
@@ -31,10 +31,9 @@ def develop_stats_delta(topic:str, delta:str):
     }
 
 def develop_stats_plot(topic:str, delta:str):
-    check_value_file(topic)
-    with open(value_selected_file(topic), 'r') as file:
+    with open(value_selected_file_merged(topic), 'r') as file:
         value_delta = [f.get(delta, -1) for f in json.load(file)]
-    value_x = [10, 25, 50, 75, len(value_delta)] #TODO change it after
+    value_x = [1000, 50000, 100000, 200000, 300000, 400000, 500000, 600000, len(value_delta)] #TODO change it after
     value_plot_mean = plt.scatter(
         value_x, 
         [
@@ -42,6 +41,17 @@ def develop_stats_plot(topic:str, delta:str):
             for i in value_x
         ]
     )
+    
+    if delta == 'delta_full':
+        k = "Between send and inserting values"
+    elif delta == 'delta_send':
+        k = "Between sent and receive of the consumer"
+    elif delta == 'delta_proccessed':
+        k = "Between receive of the consumer and insert"
+    
+    plt.title(f'{k}: mean')
+    plt.ylabel("Seconds")
+    plt.xlabel("Number of elements")
     plt.close()
     
     value_plot_var = plt.scatter(
@@ -51,6 +61,10 @@ def develop_stats_plot(topic:str, delta:str):
             for i in value_x
         ]
     )
+
+    plt.title(f'{k}: variance')
+    plt.ylabel("Seconds")
+    plt.xlabel("Number of elements")
     plt.close()
 
     value_plot_dev = plt.scatter(
@@ -60,6 +74,10 @@ def develop_stats_plot(topic:str, delta:str):
             for i in value_x
         ]
     )
+
+    plt.title(f'{k}: deviation')
+    plt.ylabel("Seconds")
+    plt.xlabel("Number of elements")
     plt.close()
 
     value_plot_mean.figure.savefig(value_selected_file_plot(topic, delta, 'mean'))
@@ -90,5 +108,7 @@ def develop_plot(topic:str):
     
 
 if __name__ == '__main__':
-    pprint(develop_stats('message_test'))#topic_test))
-    develop_plot('message_test')#topic_test)
+    if not os.path.exists(value_selected_file_merged('message_2')):
+        merge_file_topic('message_2')
+    pprint(develop_stats('message_2'))
+    develop_plot('message_2')

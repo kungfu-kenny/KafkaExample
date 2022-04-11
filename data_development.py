@@ -1,5 +1,6 @@
 import os
 import json
+from pprint import pprint
 import random
 import string
 from uuid import uuid4
@@ -16,6 +17,12 @@ def value_selected_file(x):
     return os.path.join(
         value_selected, 
         f"sent_{x}_{datetime.utcnow().strftime('%Y_%m_%d_%H')}_{int(datetime.utcnow().strftime('%M'))}.json"
+    )
+
+def value_selected_file_merged(x):
+    return os.path.join(
+        value_selected,
+        f"sent_{x}_merged.json"
     )
 
 def value_selected_file_check(x):
@@ -140,3 +147,38 @@ def develop_folder(folder:str=value_selected):
     Output: we created folder
     """
     os.path.exists(folder) or os.mkdir(folder)
+
+def merge_file_topic(topic:str) -> None:
+    """
+    Function which is dedicated to merge the topic files into one
+    Input:  topic = string with the topic which is used
+    Output: we merged all possible values
+    """
+    value_search_types = ['check', 'sent']
+    for types in value_search_types:
+        value_files = [
+            k for k in os.listdir(value_selected) 
+            if f"{types}_{topic}_" in k 
+            and (k.replace(f"{types}_{topic}_", '').split('_')[0].isalnum()
+            and len(k.replace(f"{types}_{topic}_", '').split('_')[0]) == 4) 
+            or k.replace(f"{types}_{topic}_", '').split('_')[0] == 'merged.json'
+        ]
+        if types == 'check':
+            result = {}
+        elif types == 'sent':
+            result = []
+        for f in value_files:
+            with open(os.path.join(value_selected, f), "r") as infile:
+                if types == 'check':
+                    result.update(json.load(infile))
+                elif types == 'sent':
+                    result.extend(json.load(infile))
+        with open(os.path.join(value_selected, f"{types}_{topic}_merged.json"), "w") as outfile:
+            json.dump(result, outfile, indent=4)
+        for f in value_files:
+            if '_merged.json' not in f:
+                os.remove(os.path.join(value_selected, f))
+        print('We merged files:', types)
+
+if __name__ == '__main__':
+    merge_file_topic('message_2')
