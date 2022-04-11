@@ -181,4 +181,4 @@ def merge_file_topic(topic:str) -> None:
         print('We merged files:', types)
 
 if __name__ == '__main__':
-    merge_file_topic('message_2')
+    merge_file_topic(topic_test)

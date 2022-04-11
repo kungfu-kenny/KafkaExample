@@ -11,6 +11,7 @@ from data_development import (
     value_selected_file_plot
 )
 from config import (
+    value_x,
     topic_test, 
     value_selected_storage
 )
@@ -33,7 +34,6 @@ def develop_stats_delta(topic:str, delta:str):
 def develop_stats_plot(topic:str, delta:str):
     with open(value_selected_file_merged(topic), 'r') as file:
         value_delta = [f.get(delta, -1) for f in json.load(file)]
-    value_x = [1000, 50000, 100000, 200000, 300000, 400000, 500000, 600000, len(value_delta)] #TODO change it after
     value_plot_mean = plt.scatter(
         value_x, 
         [
@@ -108,7 +108,11 @@ def develop_plot(topic:str):
     
 
 if __name__ == '__main__':
-    if not os.path.exists(value_selected_file_merged('message_2')):
-        merge_file_topic('message_2')
-    pprint(develop_stats('message_2'))
-    develop_plot('message_2')
+    if not os.path.exists(
+        value_selected_file_merged(
+            topic_test
+        )
+    ):
+        merge_file_topic(topic_test)
+    pprint(develop_stats(topic_test))
+    develop_plot(topic_test)
