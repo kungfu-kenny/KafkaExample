@@ -137,7 +137,7 @@ def develop_random_data(index:int=0) -> dict:
         "index": index,
         "uuid": str(uuid4()),
         "name_person": ''.join(random.choice(string.ascii_lowercase) for _ in range(string_range)),
-        "date_created": str(datetime.utcnow())
+        "date_created": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
     }
 
 def develop_folder(folder:str=value_selected):
