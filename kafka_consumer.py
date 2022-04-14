@@ -29,13 +29,14 @@ def calculate_consumer(received, message_sent, message_sent_uuid, message_sent_d
         True,
         topic_test
     )
-    develop_file_insert(
-        {
-            message_sent_uuid:message_sent_date
-        }, 
-        False,
-        topic_test
-    )
+    if value_add_check:
+        develop_file_insert(
+            {
+                message_sent_uuid:message_sent_date
+            }, 
+            False,
+            topic_test
+        )
     print(message_sent.get("index", -1), message_sent_uuid, message_sent_date)
     print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')        
 
